@@ -1,0 +1,44 @@
+\select@language {francais}
+\select@language {french}
+\contentsline {chapter}{\numberline {1}Symath}{1}
+\contentsline {section}{\numberline {1.1}Vectors}{1}
+\contentsline {subsection}{\numberline {1.1.1}Vector}{1}
+\contentsline {subsection}{\numberline {1.1.2}SVector}{2}
+\contentsline {section}{\numberline {1.2}Descriptors}{2}
+\contentsline {subsection}{\numberline {1.2.1}Oscillateur}{3}
+\contentsline {subsection}{\numberline {1.2.2}OscillateurSimple}{3}
+\contentsline {subsection}{\numberline {1.2.3}NewtonDescriptor}{4}
+\contentsline {section}{\numberline {1.3}Integrateurs}{4}
+\contentsline {section}{\numberline {1.4}Symkit Error, g\IeC {\'e}stion des \IeC {\'e}rreures}{5}
+\contentsline {chapter}{\numberline {2}Symgraph}{6}
+\contentsline {section}{\numberline {2.1}Scene}{6}
+\contentsline {section}{\numberline {2.2}Camera}{7}
+\contentsline {section}{\numberline {2.3}Specifics (Specs)}{7}
+\contentsline {subsection}{\numberline {2.3.1}Quelques mots de plus sur Specs.h}{7}
+\contentsline {subsubsection}{Application \IeC {\`a} une classe Specs}{10}
+\contentsline {section}{\numberline {2.4}SceneWrapper}{12}
+\contentsline {section}{\numberline {2.5}Symkit Actors}{12}
+\contentsline {subsection}{\numberline {2.5.1}Formes et d\IeC {\'e}corations}{13}
+\contentsline {subsection}{\numberline {2.5.2}Particules et oscillateurs}{13}
+\contentsline {subsection}{\numberline {2.5.3}Syst\IeC {\`e}mes de particules}{13}
+\contentsline {subsubsection}{Particlesystem}{13}
+\contentsline {subsubsection}{InteractingSystem}{14}
+\contentsline {subsubsection}{Syst\IeC {\`e}me Pendule-Coupl\IeC {\'e}}{14}
+\contentsline {section}{\numberline {2.6}Mod\IeC {\`e}les graphiques}{15}
+\contentsline {section}{\numberline {2.7}Clavier et souris}{15}
+\contentsline {chapter}{\numberline {3}Symplot}{16}
+\contentsline {section}{\numberline {3.1}Donn\IeC {\'e}es}{16}
+\contentsline {subsection}{\numberline {3.1.1}Plot\_data}{16}
+\contentsline {subsection}{\numberline {3.1.2}PlotStream}{16}
+\contentsline {subsection}{\numberline {3.1.3}SKAxis}{16}
+\contentsline {section}{\numberline {3.2}Les Graphes}{17}
+\contentsline {subsection}{\numberline {3.2.1}SKplot}{17}
+\contentsline {subsection}{\numberline {3.2.2}SKPlot2D}{17}
+\contentsline {chapter}{\numberline {4}Symviewer}{18}
+\contentsline {section}{\numberline {4.1}Viewer window et Panneax}{18}
+\contentsline {subsection}{\numberline {4.1.1}ActorPanel}{18}
+\contentsline {subsubsection}{SpecsChecker}{18}
+\contentsline {subsection}{\numberline {4.1.2}SystemPanel}{19}
+\contentsline {subsection}{\numberline {4.1.3}\IeC {\'E}space des phases}{19}
+\contentsline {section}{\numberline {4.2}Visualisateurs et modificateurs des valeurs}{19}
+\contentsline {chapter}{\numberline {5}Conclusion}{20}

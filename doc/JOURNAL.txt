@@ -1,0 +1,232 @@
+# PROGRESSION
+
+Format : [fait/à faire] TACHE	Durée (en minutes; remplacer les ??)
+
+Vous pouvez ajouter vos propres tâches si vous le jugez utile
+(p.ex. décomposition plus fine).
+
+[V] Créer le JOURNAL                                    	    	2
+[V] Lire complètement le descriptif général                  		80
+[V] S'inscrire en binôme                                      		2
+[V] Fusionner les deux projets (avec git-bash)						120
+[V] Makefile                                               	    	80
+[V] Vecteur finie (pleinement opérationnelle et testée) 	    	400
+[V] Fichier REPONSES                                         		230
+[V] Oscillateur                                            			120
+[V] Oscillateur: finition en foction du reste						120
+[V] Intégrateur d'Euler-Cromer                            			10
+[V] Pendule                                               			120
+[V] Ressort                                               			120
+[V] Systeme                                               			40                                     						
+[V] Graphisme: cadre général                              			180
+[V] Graphisme: implementation										2200
+[V] Graphisme: optimisation											1000
+[V] Structure projet (idéation de toute les classes)				200
+[V] Structure (implementation classes secondaires)					200
+[V] OscillateurCouple (tests et corrections)						360
+[V] PenduleDouble													120
+[V] Espace des phases                                     			200
+[V] Alpha															90
+[V] Beta 															90
+[V] Interface utilisateur interactive								1200
+[V] integrateur Newmark                                   			60
+[V] fichier CONCEPTION												1000
+[V] fichier README                                        			60
+[V] fichier JOURNAL 												250
+[V] fichier NOMS													1
+
+======================================================================
+# A FAIRE (PROCHAINE ETAPE)
+
+Mettez ici ce que vous pensez devoir être la ou les 2 prochaines étapes
+pour chacun. Par exemple :
+
+ATTENTION
+COMMENTER TOUJOURS SON PROPRE CODE
+
+======================================================================
+# SUIVI
+## Semaine 1 :
+
+Pris connaissance du projet, lu les documents d'information, pris connaissance des utils matématiques
+et numériques nécessaire pour l'implementation du projet
+Création d'un Makefile dynamique mis à jour en parallèle avec le projet
+
+## Semaine 2 :
+
+Set up des répertoir: un répertoir commun pour le projet et deux autres pour le travail individuel.
+Creation et administration d'un milieu de travail approprié. 
+Creation d'un fichier CMake, pour le crossplatforming (fonctionnant sur Linux et Windows) dynamique
+permettant d'implemnter dynamiquements les différentes composantes du projet. (Il sera completé vers la fin du projet).
+Creation d'une classe Vector et test liées.
+Debug de la classe Vector.
+Reponse aux questions de la semaine 2. 
+
+--------------------------------------------------
+## Semaine 3 :
+
+Set up de Qt creator sur les deux machines (laptop personnels).
+Création d'un fichier ".pro" pour la compilation du projet.
+Abandonnée l'idée d'un CMake, vu que qmake fonction très bien pour les deux plateforme.
+Prise connaissance de l'interface de Qt.
+Suivi tutoriel fourni par le cours sur Qt et OpenGl.
+Créé prototype de classes: 
+	-SVector(Vecteurs statiques(ex. positions force et accéleration))
+	-Camera
+	-Matpoint
+	-Particle
+	-Partsystem
+	-Scene
+	-Shape
+Et debut implementation.
+
+--------------------------------------------------
+## Semaine 4 :
+
+Implementation des classes:
+	-SVector
+	-Matpoint
+	-Particle
+	-Partsystem
+	-Scene
+	-Shape
+	-Camera
+Série liée au projet:
+Création de classe génerale "Oscillateur" et test liés 
+avec creation de classe héréditaire "PenduleS" (Pendule simple).
+Mise à jour du fichier REPONSES.txt
+Debug general des implementations graphiques.
+Test avec première simulation (Integration par Métode d'Euler) sur une sphère en opengl.
+
+Partition du project en qt subdirs projets:
+
+    libs:
+        - symath
+        - symgraph
+    apps:
+        - alpha
+
+symath:
+
+    Elle est la bibliotèque du projet qui s'occupe des 
+    fonctions numeriques de base sur lequelles on va 
+    construire le reste du projet, ou bien graphique et symulations.
+
+    Contenu:
+        - Vector: classe qui manage les vecteurs à dimension dynamique
+        - SVector: classe qui manage les vecteurs à dimension fixe
+        - Particle: structure qui implemente le kit de base pour une 
+                    symulation dynamique
+
+symgraph:
+
+    Ici elle est implementée toute la partie graphique qui 
+    s'interface à la OpenGL. Le système est fait d'une telle 
+    façon qu'on peut charger et enlever  des object dessinables 
+    dynamiquement. 
+
+Tests et debugs liées à chaque nouveau fichiers de code créé.
+
+--------------------------------------------------
+## Semaine 5 :
+
+Ameliorée classe Oscillateur.
+Créée sous-classe Ressort (à une dimension) et faits test corrélés.
+Creation simulations graphiques d'un Ressort et d'un PenduleS.
+Debug de ces classes (en s'aidant des simulations graphiques).
+Reponse aux questions de la serie de cette semaine.
+Implementation de methodes d'integration Newmark et Euler-Cromer distincts.
+
+--------------------------------------------------
+## Semaine 6 :
+
+Amélioration de tout le stystème graphique.
+Complétion du projets en générale avec création de SuperClasses et sous-classes pour la gestion de tout les aspects de:
+	dessin, colorage, description matématique, contrôle d'opérations etc.
+Tests et debugs liées aux implementations faites.
+
+--------------------------------------------------
+## Semaine 7 :
+
+
+Crée un structure "SKerror" pour faciliter la gestion et l'affichage de messages d'erreurs.
+Crée un système et simulation graphiques de trois objets physiques (oscillateurs).
+Création d'un test "alpha" et finition.
+Réponse aux question de la semaine 7.
+Debug de GLBuffer.
+Creation de "Conception.pdf" en latex, premier index, introduction aux répertoirs/classes principaux/le.
+"Conception.pdf" à completer dans les semaines qui suivent. 
+
+Premier rapport fait à l'assistants.
+
+Armando: Essaye classe "PeduleC", quelque soucis avec l'implementation graphique, je demanderai à Raffaele
+
+
+
+--------------------------------------------------
+## Semaine 8 :
+
+Fini implementation graphique du pendule couplé.
+Problèmes liés à sa simulation numerique:
+- Avec integrateur EulerCromer l'erreur se cumule et la valeur de vitesse explose
+- Avec integrateur newMark l'erreur se cumule et la valeur de vitesse explose,
+ ou la valeur cherchée n'est jamais assaez precise et l'integrateur entre dans une loop infinie qui bloque la simulation 
+ (pour éviter cela on lui a donné un nombre maximale de loop)
+
+Recherche du problème, on se fait imprimer l'énergie pour controller qu'elle reste constante (elle oscille bcp trop).
+Debug important à faire au niveau numerique. Essayer peut-etre un autre integrateur.
+Pas un probléme d'integrateur, pas d'ordre d'update des pendules.
+
+Nouvelles idées pour l'amelioration de nos "Systèmes" graphiques. Implementation pour la semaine prochaine.
+
+Test du fonctionnement des exceptions.
+
+--------------------------------------------------
+## Semaine 9 :
+
+Nouveau descriptor "Penduleressort".
+Crée simulation numérique et graphique d'un Pendule couplé à un ressort
+Commencement de la partie beta du projet (très probablement celle qui contiendra le main final).
+Rearrangement du système "Pendulecouplé" dans un seul descriptor pour les deux particules 
+(On laisse la vieille implementation dans le repertoir "templates", comme trace de tous nos tests).
+Résolu ainsi le problème de divergence du système d'oscillateurs couplés.
+Modifiée implementation graphique de particules et systèmes pour faciliter l'affichage d'oscillateurs couplés.
+
+Debut rédaction integrale de Conception.pdf
+Premier chapitre achevé.
+
+--------------------------------------------------
+## Semaine 10 :
+
+Reponses aux questions de la semaine 11.
+Reflection sur l'implementation d'un espace de phases.
+Implementation complete du subdir Symplot:
+	subdir dédié à la création et dessin d'un espace de phase.
+Implementation affichage des particules pour en faire une simulation mode texte, tests et debug.
+
+--------------------------------------------------
+## Semaine 11 :
+
+Fin redaction deuxième et troisième partie du document CONCEPTION.
+Implémentation d'une interface utilisateur (Subdir Symviewer).
+Correction conceptuelle des OscillatorParticle et SymSystems à l'interieur du Subdir Beta.
+
+--------------------------------------------------
+## Semaine 12 :
+
+Complétion fichier CONCEPTION.
+Amélioration et debug de l'interface utilisateur (GUI).
+Implémentation plus interactive de cette dernière. 
+Creation d'un premier panel de contrôle.
+Contrôle globale du côde, recherche d'exceptions pas encore gérées.
+Redaction d'un README.
+
+--------------------------------------------------
+## Semaine 13 :
+
+Completion des fichiers texte: README, JOURNAL, CONCEPTION.
+Eventuelle correction de la grammaire, 
+surement pas tout juste car on est les deux italophones, 
+surtout pour ce qui concerne les accents c'est un problème.
+Implémentation d'un panel de contrôle pour touts les oscillateurs implémentés.
+Ultimation du projet.

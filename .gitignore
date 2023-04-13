@@ -1,0 +1,8 @@
+#builders
+*.pro.user
+
+#builds
+build
+
+#test directory
+test

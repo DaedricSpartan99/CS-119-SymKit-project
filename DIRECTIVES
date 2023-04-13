@@ -1,0 +1,166 @@
+Programming project
+
+Semester II, Physics session
+
+Introduction:
+
+    The purpose of this project is to learn how to
+    symulate a physical system and, eventually, implement
+    it using a 3D graphical engine.
+
+    The programming language used is the C++.
+    A graphical representation is written
+    using the OpenGL engine powered by a Qt window manager.
+
+Members: Raffaele Ancarola, Armando Cincotti 
+
+Goals:
+
+    I) Numerical symulation of a simple system (ex. a pendule)
+
+    II) Describing a more complex system (ex. damped harmonic oscillator)
+
+    III) The symulation of a particle system (always numerically)
+
+    IV) Graphics setup (Qt and OpenGL)
+
+    V) The transposition of older symulations into a graphical representation
+
+Coding rules:
+
+   - The content of a .h file must be bound by a #ifndef MACRO block in order 
+     to prevent compilation conflicts, for example:
+
+    #ifndef __MYFILE_H__
+    #define __MYFILE_H__
+
+    /* My content */
+
+    class MyClass
+    {
+        /* Class content */
+    };
+
+    #endif // __MYFILE_H__
+
+   - Class names must begin with a capitalized letter, for example:
+
+    class MyClass
+    {
+        /* Class content */
+    };
+
+   - Namespace, structure, variable and function names must NOT begin
+     with a capitalized letter, for example:
+
+     void eraseAll();
+
+     int foo = 0;
+     double _time;
+
+     struct boundingBox
+     {
+        /* Struct content */
+     };
+
+   - Warning!
+
+     Few and well structured classes is better than 
+     a lot and small ones.
+     Which means that inheritance is powerful and, for this reason,
+     it is easy to abuse too.
+
+    - Reminder of Chappelier: Never, NEVER copy-paste implementation code
+      Use functions, classes, inheritance, pointers instead
+
+    - Keep strict order in your code
+      Remember that your partner have to be able
+      to fully understant your code, so there are some tips:
+
+      - TAB INDENT SET TO 4 SPACE CHARACTERS
+
+        Your partner could use a different editor than yours,
+        so taking fixed the Tab indent size to "4 space characters"
+        is good in order to read the same text in the same vision
+
+      - EXPLAIN WHAT YOU ARE DOING
+
+        C++ allows you to comment your code.
+        In some complex situations understanding a plain code
+        could be much complicated for other people.
+        Another reason to comment your code is that it speeds up
+        debugging. Sometimes making an important change to the code
+        could cause confusion onto other parts of the code, so commenting
+        your code is useful to find faster an error and fix it better.
+
+        For example:
+    
+        /* Set the delta time */
+        void set_dt(const float&);
+
+        extern int error; // global error code
+
+      - MAKE NAMES NOT TOO LONG
+
+        Avoid very long names. 
+        Even if more comprehensible, use shorter names and eventually
+        comment to explain them.
+
+      - INDENTATION IS IMPORTANT
+
+        Indentation style if free, but it must be fixed, ordered and logical.
+
+        Some examples to write the same thing:
+
+        - KEYWORDS USAGE
+          
+          float hello(const int& entry);
+
+          float
+          hello (int const& entry);
+
+        - LOOPS
+          
+          for (int i = 0; i < 100; ++i)
+          {
+              /* Content */
+          }
+
+          for (int i = 0; i < 100; ++i) {
+              
+              /* Content */
+          }
+
+          int i;
+          for (i = 0; i <= 99; ++i) {
+              
+              /* Content */
+          }
+
+        - CONDITIONALS (4 spaces indent template)
+          
+          if (s == "hello") {
+                
+              s = "_hello_";
+
+          } else if (s == "_hello")
+              
+              s += "_";
+
+          } else {
+              
+              s = "_none_";
+          }
+
+        - NESTING (4 spaces indent template)
+
+          if (enable)
+          {
+              for (auto obj : objects)
+              {
+                  if (obj == 0)
+                      continue;
+                  else 
+                      return obj; 
+              }
+          }

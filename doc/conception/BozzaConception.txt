@@ -1,0 +1,378 @@
+﻿#Introduction
+
+Dans le cadre du cours d'informatique de la section de Physique, pour l'année 2018 on se trouve à devoir développer
+un programme permettant de simuler numeriquement, et visualiser graphiquement, un sistème de plusieurs oscillateur harmoniques
+et d'oscillateurs couplés.
+Le document qui suit sert à illustrer la conceptualisation de notre projet couche par couche, jusqu'à l'illustration complète
+de ce qu'est notre programme à l'heure actuelle et de ses fonctionnalités.
+Dans l'idéation du programme, tout en suivant les cosignes principales, nous avons essayé de garder nos idées originales,
+pour rendre notre travail plus personnel possible, en deviant parfois dès consignes secondaires données par le professeurs
+tout le long de l'année pour nous guider dans la création du programme.
+Dans la suite, on essayera d'expliquer au mieux quand est-ce que notre programme devie dès consignes données, et pourquoi.
+Deux sont les buts que nous nous sommes donnés dans le developpement du projet:
+Le principal étant la bonne réusite de notre travail dans le cadre du cours, et donc dans le but d'obtenir une bonne évaluation.
+Le deuxième, pas moins important pour nous, étant la création d'un util numérique pour simulations physiques plus générales,
+étant donné qu'un tel programme pourrait nous être très utile tout au long de notre formation de physiciens.
+
+Le projet principal, qu'on a appelé Symkit (pour Symulation Kit), est composé de trois sous-parties, qui gèrent les aspects purement 
+matématiques, graphiques ou du plotting de graphes liés aux systèmes physiques simulés.
+Symkit compte en plus deux subdirs Alpha et Beta, qui font le lien entres les trois partie du programme. 
+Ils contiennent en faite le main qui crée et lance les simulations numeriques et leurs raprèsentations graphiques.
+Alpha comprenant nos premiers tests sur le complexe du programme, et Beta representant le résultat final après toute correction et 
+amélioration.
+
+
+#Chapitre 1
+
+Symath
+
+#1.1  Vectors
+
+- Vector :
+ Cette classe raprèsente un vecteur à dimension quelquonque, utile pour la gestion d'un ou plusieurs paramètre.
+ La dimension dépend souvent du nombre de degrès de liberté de l'oscillateur où le vecteur est utilisé. Par exemple
+ pour un pendule qui bouje le long d'un plan fixe dont on peut modéliser le mouvement en fonction de la seule variation
+ d'un angle, on utilisera un Vector de dimension 1 ayant en cordonnée l'angle que le pendule crée avec la verticale. 
+ Pour cette classe sont definis: 
+  -Un constructeur par defaut l'initialisant à la valeur {0}, un Vector par defaut sera donc de dimension 1
+   ceci parce que les oscillateurs harmoniques décrits ont souvent un seul degré de liberté.
+  -Des constructeur pour initialiser un Vector de plusiseurs manières (par vector, initializer list etc.).
+  -Des utils de looping pour traverser les differents paramètre (utilisés parfois dans les autres fonctions implementées).
+  -Fonctions pour la modification de la dimension du Vector.
+  -Plusieurs operateurs dont:
+	- Un accesseur aux paramètre stockés, operator[], permettant aussi de les modifiers s'il le faut.	
+	- Des operateurs implementant somme interne et produit externe canoniques d'un espace vectoriel R(n).
+	  Ces ci sont construit pour permettre la concatenation d'operations sur des Vector.
+	- Operateur implementant produit scalaire et vectoriel (si la dimension des Vector est compatible, sinon on lance un erreur).
+	- Des operateurs de comparaison d'ordre, qui effectue la comparaison sur le module du/des Vector.
+	- Des operateurs de comparaison de similitude, pour savoir si deux Vector sont égaux ou non.
+	- Un operateur "-" retournant l'inverse additif du Vector, et "~" l'inversant.
+  -Deux fonction retournant le module du vecteur ou son carré (pour éviter une operation de plus).
+  -Une fonction returnant le vecteur unitaire du Vector concerné. Cette fonction est très utile pour caractériser des axes de restriction de mouvement.
+   En effet, pour evaluer la projection d'un vecteur sur un certain axe de mouvement, pour simplifier les calculs il suffit de calculer le produit scalaire
+   du vecteur pour le vecteur unitaire décrivant l'axe.
+
+- SVector :
+ Celle-ci est une classe qui n'a pas été demandé par le prof, mais qu'on a crée pour distinguer les vecteurs pour la gestion de paramètres numériques caractérisant
+ les systèmes physiques simulés, dès vecteurs utilisés pour placer des objet dans un environnement graphique tridimensionnel.
+ SVector est une classe template, pour qu'on puisse la definir pour différentes valeurs de T. T representant une dimension fixe pour un SVector.
+ Cette classe décrit donc des vecteurs à dimension fixe, et elle implemente essensiellement les même fonctions présentes dans la classe Vector sauf pour celles qui en modifient la dimension.
+ En effet, des vecteurs destinés à "se déplacer" dans un espace à dimension finie fixe, n'auront jamais à modifier leur dimesion.
+ Cette classe a été créée pour être utilisé dans la partie du programme qui gère la graphique. 
+ Des SVector<3> (de dimension 3) sont donc utilisés plus loin dans le programme pour décrire par exemple la position de caméra et objets graphiques.
+
+ Pour les deux types de Vecteurs a été défini en fin, un overload de l'operator<< pour qu'on puisse afficher facilement la liste de valeurs d'un vecteur.
+ Cet operateur est utilisé par exemple pour afficher les valeurs de position et vitesse d'un objet physique en évolution, pour obtenir ainsi une simulation en mode texte.
+
+N.B. Un objet graphique est placé dans l'environnement 3D en fonction d'un SVector<3>, mais l'objet physique lié à un certain objet graphique,
+est décrit au travers d'un Vector contenant sa vitesse et un Vector contenant sa position, lesquels peuvent évoluer en fonction d'équations spécifiés plus loins dans le programme.
+Il y pourtant l'ecception des objets physiques décrit par des NewtonDescriptors (voir paragraphe suivant), lequels sont décrit au travers de SVectors<3>.
+
+#1.2 Descriptors
+
+La Classe Descriptor:
+
+ Un Descriptor est un objet qui permet de décrire un comportement évolutif dans le temps pour un objet physique quelquonque.
+ La classe Desciptor est une classe abstraite, contenant en effet une unique méthode virtuelle pure update(), utilisée pour "mettre à jour" l'objet,
+ en le faisant évoluer en fonction de son type (oscillateur ou masse ponctuelle newtonienne pour ce qui a été fait à l'heure actuelle).
+ Cette méthode est donc redefinie dans les classes héritant Desciptor.
+
+ Voici les classes héritant directement de Descriptor:
+ - Oscillateur :
+	Un Oscillateur est un descriptor décrivant le mouvement d'un oscillateur harmonique ou d'un oscillateur couplé.
+	Celle-ci est une classe abstraite.
+	Attributs:
+	 - Deux Vectors contenant positions et vitesses des masses composantes l'oscillateur décrit.
+	   Ceux-ci peuvent être modifiés pour que l'objet décrit puisse évoluer.
+	 - Un "integral_operation" qui est un type enum (EULER_CROMER ou NEWMARK) qui sert à spécifier au travers de quel intrgrateur
+	   la méthode update() mettra à jours les valeurs de position et vitesses de l'oscillateur.
+	Méthodes:
+	 - equation(), une méthode virtuelle pure qui défini, dans chaque sous-classe d'oscillateur, l'équation décrivant le mouvement de l'oscillateur.
+	 - update(), redefinie ici pour prendre en argument un pas de temps et modifier avec un certain integrateur, les valeurs de vitesse et position
+	   de l'osccilateur. Ceci est fait en fonction de la methode equation().
+	   
+	   Le comment la methode equation est utilisée est spécifié lors de l'explication des integrateurs.
+	   
+	 - Des constructeurs appropriés, exploitant chaqun une manière différente de construir un Vector.
+	 - Accesseurs et Manipulateurs pour accèder ou modifier les attributs de la classe.
+
+ - OscillateurSimple :
+	Sous-classe abstraite d'Oscillateur décrivant les oscillateurs comportant une seule masse.
+	Cette sous-classe ajoute à la classe Oscillateur une méthode virtuelle pure cartesiennes().
+	Cette dernière a été implementée pour convertir la position de la masse décrite en un SVector<3>.
+	En utilisant des cordonnées cartesiennes dans l'environnement graphique, on en a besoin pour qu'on 
+	puisse utiliser un vecteur position compatible avec l'implementation graphique.
+	Vu qu'on OscillateurSimple décrit le mouvement d'une seule masse, ça vaut la peine, d'après nous,
+	d'accèder ainsi à la position de l'objet.
+
+ - NetonDescriptor :
+   Un NewtonDescriptor est un descriptor décrivant l'évolution d'une masse pontuelle sujette à des forces dans un espace euclidian
+   suivant les principes de la mécanique newtonienne.
+   Il nous parait important de spécifier que cette classe n'as pas été demandée pour le projet, et que restent des corrections à faire
+   vu qu'on s'est intéressés plus à ce qui était démandé pour bien réussir dans notre évaluation finale.
+   On a quand même crée un tel objet dans le main pour en illustrer l'idée d'implementation possible.
+   Attributs:
+   - Masse de l'objet.
+   - Trois SVector<3>, contenant position, vitesse et force appliquée à l'objet.
+   Méthodes:
+   - Constructeurs appropriés et un destructeur
+   - update(), qui modifie position et vitesse de l'objets par l'integrateur d'Euler Cromer, en foncion du vecteur force resultant appliquée à l'objet
+     et en fonction de sa masse.
+
+	 
+Pour un Oscillateur a été implementé un overlad de l'operator<<, permettant d'imprimer sur un ostream comme cout, les vecteurs position et vitesse.
+Cet affichage, à chaque pas de temps, sera l'implentation pour une simulation en mode texte.
+	
+	
+#1.3 Integrateurs
+
+ Celle des integrateurs est une des implementations qui a le plus dévié par rapport aux indications donnés.
+ Les indications voulaient qu'on crée une classe integrateur qui traite la méthode d'integration d'un oscillateur différemment
+ en fonction du type d'integrateur pris, et que ce soit l'integrateur à prendre en attribut un oscillateur pour le modifier.
+ Dans notre conception, à chaque méthode d'integration correspond une fonction qui prend en paramètre(par référence), un vecteur position et vitesse
+ et en modifie les valeurs en fonction d'un pas de temps et d'un vecteur acceleration.
+ Ce dernier correspond à la valeur de retour de la fonction equation() pour les oscillateur, et au vecteur forces pour un NewtonDescriptor.
+ C'est donc, à ce moment, le Desciptor qui appele la méthode d'intégration choisi au travers de la méthode update(), en modifiant ainsi ses propres attributs.
+
+ Les méthodes d'integration sont insérées dans integrator.h (et .tpp), dans le namespace symkit, ainsi les Desciptors y ont accès au travers de ces deux ligne de code: 
+ "#include skerror.h"
+ "using namespace symkit" (pour faciliter l'appel des méthodes).
+ De plus les méthodes sont définies pour un type template, pour qu'elle puissent fonctionner pour des Vectors, si les appelle un Oscillateur,
+ ou aussi pour des SVectors, si à les appeler est un NewtonDescriptor.
+ Grace à cette implementation, on évite de créer une classe de plus à chaque fois qu'on veut implementer une nouvelle méthode d'integration.
+
+#1.4 Symkit Error, gestion des érreurs.
+
+SKerror :
+ SKerror est une structure contenant données, informations et commentaires utiles pour gérer un erreur pendant l'éxecution du programme.
+ Se trouvant dans namespace symkit, à l'interieur de skerror.h, toutes les classes peuvent y avoir accès, et l'utiliser facilement
+ à travers les commande "#include "skerror.h"" et "using namespace symkit".
+ Lorsque, dans une certaine fonction le code est suceptible de générer une erreur, un SKerror est lancé, et au moment du catch
+ un message d'erreur est affiché sur l'ostream cerr, grace à l'overload de l'operator<< pour les SKerror.
+ Eventuellement le programme s'arrête si l'erreur est fatale.
+ Les informations contenues dans un SKerror sont:
+  - Type d'erreur (de type enum).
+  - Nom de la fonction qu'a généré l'erreur.
+  - Nom de la classe qui contient cette fonction.
+  - Fatalité ou non de l'erreur (de type bool).
+  
+
+# Chapitre 2
+
+Symgraph
+
+#2.1
+
+Scene :
+
+ La classe Scene ouvre une fenêtre OpenGL et manage le monde de dessin 3D.
+ Elle implément un mécanisme qui enregistre les composantes de type SKActor et les distingue parmi leur rôle (évoluable, dessinable, etc).
+ Les rôles seront spécifiés dans les prochaines section. 
+ C'est dans cette classe qu'on gére le fonctionnement/evolution des objets graphiques, ajoutés à la scène, en temps de compilation,
+ et en runtime, grace au système des "listeners" qui traduisent des input clavier (et eventuellement souris, à implementer), en commandes de gestion en temps réel.
+ La scene peut hériter d'une classe listener, si elle gère les input d'un certain type.
+ Scene implemente une fonction pour la gestion de la runtime (voir Scene::timerEvent en symgraph/scene.cpp)
+ laquelle définie l'ordre de mise à  jour des éléments travaillant dans et sur la scène, ordre à respecter à chaque pas de temps, en tenant compte des input externes, si il y en a.
+ Le pas de temps est propre à la scène, comme si les objets se trouvaient dans un espace avec un temps rélatif identique pour toutes les particules (ce qui est sensé d'après nous).
+ Scene est strictement liée à une classe "Camera" pour la gestion de la vision du monde 3D de symulation.
+ Scene gère aussi la simulation mode texte: ai l'on veut, en appuyant sur un numero il est possible d'afficher les valeurs d'évolution d'une ou plusiseures particules.
+ Ainsi faisant la simulation mode texte devient optionnelle, mais elle est de toute façon implementée.
+
+ Cette classe est celle qui correspond, à peut-prè, au support à dessind demandé par les consignes du projets. 
+ Pourtant nous l'avons implementée comme étant une scène, prenant des objets graphiques, bien différents des Descriptors mais liées à ceux-la pour évoluer dans la scène.
+ Scene est un "SceneWrapper" (Classe décrite plus loin) donc elle contient plusieurs objets graphiques, des actors, qu'elle fait évoluer et qu'elle dessine chaqu'un de sa manière
+ grace au mécanisme de résolution dinamique des liens.
+ Donc, comme pour un support à dessin elle gère le dessin, mais la méthode de déssin reste propre aux objets déssinnés
+
+ 
+#2.2
+
+Camera :
+
+ Camera est une classe qui contient les infomations et les methodes pour la gestion d'une camera virtuelle dans le monde graphique 3D.
+ La classe Scene peut facilement obtenir de cette classe une QMatrix4X4 pour la création de la scène 3D au travers de la fonction getMatrix() contenue dans Camera.
+
+#2.3
+
+Specifics (Specs) :
+
+ Les superclasses qui déterminent l'identité d'un objet destiné à être enrégistré dans Scene sont à la base du système polimorphique de Symgraph.
+ En fait, chaque classe joue un rôle différent, par une ou deux méthodes, dans le déroulement d'un frame pendant la simulation.
+ Voici les classes en ordre d'appel :
+	1 Evolvable : Classe des objets graphiques pouvant évoluer, elle contient une fonction d'évolution evolve(float).
+	2 Describable : Classe des objet peuvant évoluer selon un Desciptor, elle contient donc une reference au descriptor du quel cette classe dépend.
+	3 Positionnable : Classe des objets peuvant être positionnés.
+	4 Orietable : Classe permettant d'appliquer une orientation à l'objet.
+	5 Scalable : Classe permettant de changer la grandeur des objets graphiques.
+	6 Colorable : Classe permettant de changer la couleur des objets graphiques.
+	7 Renderable : Classe des objets "déssinables".
+ De plus, pour permettre de pouvoir abiliter/désabiliter ces fonctions pour une certaine classe qui hérite ces caractéristiques, dans le fichier specs.h est définit un système à bitfield qui manage cette option.
+	!!! Ajouter concept de specs.h !!!
+ 
+ N.B.
+ Ces Specifics s'appliquent à des objets graphiques, comme par exemples des particules (voir plus bas), on ne déssinne donc pas dans des oscillateur dans la scène,
+ mais plutôt des particules liées aux oscillateurs, étant ces derniers des objets physiques décrivant, dans notre conception, l'évolution d'une particule ou d'un système de particules.
+ 
+#2.4
+
+SceneWrapper :
+
+ SceneWrapper est la super classe d'un objet de classe Scene. 
+ Cette classe contient 4 liste de pointeurs à 4 types d'objets graphiques differents:
+	-SkActor
+	-Evolvable
+	-Describable
+	-Renderable
+ Ainsi une instance de scene pourra travailler sur ces 4 types différents d'objets spécifiquement.
+ SceneWrapper hérite directement de Evolvable et de Renderable, donc elle contient une méthode evolve et render, qui consiste à faire évoluer et déssinner
+ les renderables et dessinnables qu'elle gère, simplement grace au mécanisme de la résolution dinamique des liens, en appelant evolve et render pour chaqu'un des objets.
+ Il est vrai que des objets contenus comme les evolvables et describalbe peuvent être les deux en même temps, mais en enregistrant leurs adresses dans des listes différentes
+ lorsqu'on veut dessinner tout les dessinnables, ou utilisers tout les actors, ou plus, il suffit d'appelet la fonction pour les membre d'une des liste, ainsi on gagne en complexité temporelle
+ car pour des objet qui sont forcement tous spécialisés dans l'action qu'on demande, il n'y a pas besoin de faire tout un tas de contrôles néccessaires autrement.
+ 
+#2.5
+
+Symkit Actors :
+
+	!!! Corriger !!!
+ La classe SKActor est la classe base de tout ce qu'on peut enregistrer dans une Scene.
+ Cahque instance de cette classe contiendra une Qstring fonctionnant de ID, et un bitfield permettant d'activer ou desactiver,
+ à l'initialisation de l'acteur, ses spécificités (comme décrit dans specs.h). 
+ La classe possède une Macro qui gènère l'accès qux méthodes définies dans specs.h 
+ 
+ Les sous-classes définies dans symgraph se divisent dans les suivantes catégories :
+	- Formes (Shape)
+		- Décorations
+		- Particules
+	- Systèmes (ParticleSystem)
+		- Systèmes interactifs
+		- Systèmes d'oscillateurs
+
+#2.5.1
+
+Formes et décorations :
+
+!!! ce qu'on a va très bien !!!
+
+#2.5.2
+
+ !!! Ajouter ce qui viens à ce qu'on a !!!
+ 
+ En particulier les deux classes contiennent une méthode "position" qui permet d'obtenir la position évoluante pour le dessin du model dans le monde graphique.
+ On a fournit deplus à la classe OscillatorParticle, un offset et des méthodes permettant de deplacer l'origine autour de la quelle la particule évolue.
+ 
+#2.5.3
+
+Systèmes de particules :
+
+ Pour ce type d'objet existent dans notre programme plusieures implementations, dont certaines implementées pour être utilisées en dehors du cadre du projets, et pour élargir le domaine de simulation possibles de notre programme.
+ 
+ParticleSystem :
+	ParticleSystem est une classe qui gère plusieurs Particles permettant de les regrouper dans une domaine.
+	Elle possède donc une liste de pointeurs à des particules, et des méthodes pour en ajouter ou en enlever.
+	Cette classe hérite de Evolvable et Renderable et défini donc les méthodes pour faire évoluer et déssinnee les particules stockés dans cette classe.
+	Un ParticleSystem possède aussi un offset, et hérite de Positionnable la méthode "position" qui retourne ce dernier paramètre, pour qu'on puisse déssinner
+	chaque particule en fonction de la position du système. Chaque particule évoluera autour de l'offset du système.
+
+InteractingSystem :
+	InteractingSystem hérite de ParticleSystem et spécifie comment les particules du système interagissent entre elles à deux à deux par la méthode "interaction".
+	Cette classe a été conçue pour faire évoluer des Particules de type NetonParticle, elle sort donc du cadre du projet, mais elle nous sera utile en futur, pour permettre
+	de developper des interaction physiques plus générales entre particules.
+	Elle redefinie la méthode "evolve" pour considérer l'interaction entre particules.
+
+Système Pendule-Couplé :
+	Une classe ActorGroup hérite directement de SceneWrapper et sert comme classe de base pour un système de type pendule-couplé.
+	Un tel système est representé par la classe SymSystem, qui hérite entre autre de Describable et Positionable (pour implementer le même système d'offset que le Particlesystem).
+	Il prend comme descriptor des Descriptor pour oscillateurs couplés, pour obtenir de ce dernier les informations pour dessinner et faire évoluer deux particules.
+	Dans le subdir Beta, pour finir, pour chaque sous-classe de Symsystème sera définie une Shape positionnable, qui prend en attribut un numero d'identification (0 ou 1 pour deux oscillateurs couplés entre eux)
+	et qui retourne, par la méthode "position" la position de la shape en fonction de son id.
+	
+	Pour simplifier la compréhénsion du fonctionnement de la classe, de suite un exemple détaillé est illustré.
+	
+	Ex. Dans Beta existe la classe PendCouple, qui hérite de SymSystem, et PenduleDesc, un Descriptor de type Oscillateur décrivant l'évolution d'une couple de pendules. 
+		On defini maintenant une Shape PendSphere, qui hérite de Positionnable. PendSphere prend en attribut un pointeur à un PenduleDesc, et un int constant fonctionnant de numero d'identification.
+		Si le id est 0, la méthode "position" retourne la position de la première particule décrite par PenduleDesc, sinon elle retourne la position de la deuxième particule décrite.
+		PendCouple prend en attribut un pointeur à PenduleDesc, et deux Pointeur à deux PendSphere initialisées avec 0 et 1 comme id.
+		PendCouple initialise les PendSphere auquel ses pointeurs pointent, en leur donnant en réference PenduleDesc, ainsi il pourra les dessinner chacune en fonction de leur position.
+		
+
+ 
+#2.6
+ 
+ Modèles graphiques
+ 
+ !!! c'est bon comme il est, j'ai corrigé les fautes d'orthografe et de syntaxe !!!
+ 
+#2.7
+
+ KeyListener et MouseListener sont des classes abstraites décrivant des objets déstinés à récolter des input, respectivement venant du clavier et de la sourie,
+ pour éxecuter une certaine commande à chaque input prédéfini.
+ Dans une instance de Scene, qui hérite KeyListener ou MouseListener, on définit en effet les commandes à executer sous l'influence d'un certain nombre d'input.
+ Le listener contien pour finir une méthode pour être activé/desactivé, et une méthodes pour controller s'il est activé ou pas.
+ 
+
+# Chapitre 3
+
+SymPlot
+
+#3.1
+
+Données
+
+Data_plot :
+
+ Pour representer des données caractéristiques d'un graphe elle existe la struct template plot_data dans le programme.
+ Cette struct prend en attribut un "argument" de type indéfini, qui correspond à la préimage d'un point "image" du graphe.
+ Un double img en attribut représent cette "image".
+ 
+ Pour l'Espace des Phases, on défini un "typedef plot_data<double> Point2D", qui represente un point bidimensionnel de l'espace.
+
+PlotStream :
+
+ PlotStream est une classe template representante un stream de plot_data, une liste de points stoqués pour qu'on puisse les dessinner et les garder sur le dessin du graph de l'Espace des Phases.
+ En attribut elle prend un vector de plot_data (Pour le projet on crée un PlotStream de Point2D).
+ Comme méthode elle implemente des manipulateurs, accesseurs et itérateurs pour travailler sur le stream.
+ Elle implemente enfin la surcharge de l'operator<< pour pouvoir ajouter des plot_data à la liste contenue en attribut.
+
+SKAxis :
+
+ SKAxys est une struct contenant les information utiles pour la constructions d'un axe dans un graph: l'échelle, l'offset et la couleur.
+ Cette struct contient aussi, outre qu'un constructeur, deux méthodes pour en modifier l'offset et l'échelle.
+
+#3.2
+
+Les Graphes
+
+SKplot :
+
+	SKPlot est la classe base pour le dessin de graphes dans le programme. 
+	Elle a en attribut :
+		- Un pointeur sur un QGLShaderProgram pour le dessin du graph.
+		- Deux SKAxys pour le dessin des axes. 
+		- Un boolean qui spécifie si les ShaderProgramm ont été chargées.
+		- D'autres attribut utiles au dessin du graph par les Shaders.
+	Les Méthodes :
+		- Un constructeur et un destructeur.
+		- initializeGL, fournie dans le tutoriel pour Qt, laquelle charge et compile les shaders
+		- PaintData et PaintAxis, méthodes virtuelles pures, pour le dessin des axes et des points à travers un ShaderProgram fourni en attribut.
+		- PaintGL, qui appelle PaintData et PaintAxis.
+		- ResizeGL fournie dans le tutoriel Qt.
+		- Accesseurs et Manipulateurs des différents attributs de la classe.
+
+SKPlot2D :
+
+ Dans "skplot2d.h" on défini une struct "ColoredFuncion", qui prend en attribut un PlotStream<double> et une couleur.
+ Une couleur est une liste de 4 float fonctionnants selon le protocole rouge, vert, bleu, alpha, où alpha correspond au facteur de transparence.
+ Cette struct represente les points d'une fonction colorée.
+ 
+ SKPlot2D hérite directement de SKPlot, prend en attribut des ColoredFunctions, et défini PaintData pour le dessin et coloriage de ces dernières.
+ Elle définie aussi une fonction keyPressEvent pour la géstion des input clavier.
+ Cette classe est l'implementation de l'Espace des Phases 2D.
+
+# Chapitre 4
+
+Symviewer :
+
+ Symviewer est un Subdir supplementaire, non-requis par le projets, mais construit pour gérer une interface utilisateur.
+ 
+

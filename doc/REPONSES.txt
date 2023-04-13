@@ -1,0 +1,219 @@
+Ce Document sert pour répondre aux questions posées dans les différentes séries liées au projet
+
+#Série Semaine 1
+
+[Question P1.1] Comment représentez-vous ces vecteurs ? Comment sont-ils organisés : quels attributs ? quelles méthodes ? quels droits d'accès ?
+
+ Nous représentons ces vecteurs sous forme de vectors dinamiques, ayant comme dimension de default 3, car on travaillera souvent avec des vecteurs de dimension trois:
+ ex. vecteurs position, force, accèleration etc.
+ L'aspect dynamique des vectors nous permettrera de pouvoir modéliser de façon plus libre ces vecteurs, pour les transformer par exemple en listes de paramètre
+ qui pourraient être utiles comme entrée de fonctions avancées pour l'integrations numérique des équations du mouvement, aspect fondamentale pour notre projet.
+
+ En attribut nous avons choisi un "vector<double> components", lequel contiendra les coordonnées du vecteur de la classe "Vector". 
+ On a choisi d'utiliser un vector pour pouvoir exploiter de nombreuse fonctions déjà existant dans la librairie corréespondante, en les implementant pour notre classe
+ (Voir par exemple la fonction Vector::size()).
+ Ainsi faisant, nous pouvont rendre la classe plus dynamique et modulable.
+
+ On a comme méthodes:
+ Trois constructeurs et un destructeur nous facilitant les taches de création et déstruction d'un vecteur.
+	Un constructeur par defaut qu'initialise le vecteur à une dimension de defaut identique pour chaque instance de la classe.
+	Un constructeur prenant en argument une liste de double et l'affectant au vecteur "components".
+	Un constructeur prenant en argument un vector de double et l'affectant au vecteur "components".
+
+ Des iterateurs, pour itérer dans les coordonnées des vecteurs.
+ Une fonction Vectot::unit(), retournant un vecteur unitaire de même direction du vecteur d'intérêt.
+	très util pour la construction des équations de Newton. 
+
+ Trois Manipulateurs:
+	La fonction Vector::augmente(), permettant d'ajouter une dimension et la coordonnée corréspondante au vecteur.
+	La fonction Vector::clear(), nous permettant de vider le vecteur et le faire retourner à dimension 0. 
+		Ce manipulateur est utilisé par la suite, par l'operator "=" pour vider le vecteur dans lequel on veut copier l'autre avant de l'affecter.
+
+ Plusieurs accesseurs dont:
+	La fonction Vector::size(), qui permet d'utiliser la fonction size() déja presente dans la librairie <vector>, mais sur notre classe "Vector".
+	Les fonctions Vector::module() et Vector::sq:module(), retournant respectivement le module et le carré du module du vecteur.
+	
+	Plusieurs operators implementés pour faciliter les operations à faire sur les vecteurs:
+		Operator +, +=, - et -= pour la somme des vecteurs.
+		Operator *, *=, / et /= pour la multiplicaton entre un scalaire et un vecteur.
+		Operator * pour le produit scalaire entre deux vecteurs.
+		Operator ^ pour le produit vectoriel entre deux vecteurs (de dimension 3).
+		Operator [] pour pouvoir accéder rapidement et intuitivement à une coordonnée du vecteur.
+			Ce dernier permet aussi d'affecter plus rapidement cette variable. 
+			C'est en effet le motif pour lequel nous n'avons pas choisi la foction set_coord().
+		Operator == nous retournant true ou false si les deux vecteurs comparés sont égaux ou non
+			Ce dernier sobstitue la fonction compare().
+		Operator != ayant le comportement inverse de l'operator == .
+		
+		N.B. les operators + - * / sont definis en externe. 
+
+
+ L'accès est publique à toutes les méthodes car toutes directement utiles dans la manipulation des vecteurs.
+
+ Les attributs sont en accès privé.
+
+
+[Question P1.2] Quel choix avez vous fait pour les opérations entre vecteurs de dimensions différentes ?
+
+ Nous avons choisit de lancer une exception (un message d'erreur), lorsque l'utilisateur lance un produit scalaire ou vectoriel sur deux vecteurs n'ayant pas de dimensions compatibles.
+ On préfère traiter comme ça le problème et ensuite implementer des traitement plus particulier en fonction du cas spécifique, si il y aura besoin.
+ Dans le cas de somme de deux vecteur ayant dimensions différentes, on a choisi de donner priorité au vecteur qui apparait en premier dans l'opération.
+ Ceci permettra à l'utilisateur de choisir d'obtenir le vecteur de dimension voulue.
+
+
+
+#Série semaine 4
+
+
+[Question P4.1] Avez-vous ajouté un constructeur de copie ? Pourquoi (justifiez votre choix) ?
+
+ Nous avons ajouté un constructeur de copie prenant en argument un Vector pour faciliter la tache de copie de vecteur à l'initialisation.
+ De plus on a ajouté un constructeur de defaut, initialisant chaque Vector à un vecteur de dimension 1.
+
+
+
+[Question P4.2] Si l'on souhaitait ajouter un constructeur par coordonnées sphériques (deux angles et une longueur) pour les vecteurs de dimension 3,
+
+	a] que cela impliquerait-il au niveau des attributs de la classe ?
+	b] quelle serait la difficulté majeure (voire l'impossibilité) de sa réalisation en C++ ?
+
+ a]Dans notre cas rien car le seule attribut est un vecteur de double, et soit les angles soit les distances peuvent être representés comme double.
+ Cela par contre provoquerai le devoir re-conceptualiser les methodes concernant la manipulation des vecteurs, par exemple celle de l'operateur "^"
+ dont la definition "polaire" peut devenir vite compliquée.
+
+ b]... On en voit pas
+ La conversion des angles en radians ???
+
+	
+	
+[Question P4.3] Quels opérateurs avez vous introduits ?	
+
+ Les operateurs sont ceux itroduits la premiere semaine (Voir question P1.2). Nous avons ajouté par contre, dans "vector.cpp", la definition de l'operateur d'affichage <<
+ pour notre classe Vector. La methode etant externe à la classe, et étant l'operateur un operateur d'affichage, on a décidé d'insérer son prototype
+ dans "iosfwd" où l'on y declarera les opérateur d'affichage de nos classes.
+ 
+ P.S. le namespace iosfwd n'existe plus, la définition de l'operateur << est présente dans vector.cpp
+
+
+
+#Série semaine 5
+
+
+
+[Question P6.1] Comment avez vous conçu votre classe Integrateur ?
+
+ On n'as pas conçu de classe pour l'integrateur, mais on a plutôt integré dans la classe "Oscillateur" une méthode "update"
+ qui implemente l'integrateur d'Euler cromer pour n'importe quel sous-classe d'Oscillateur.
+ En effet, un tel integrateur fais evoluer le vecteur position p en foction du vecteur vitesse p_prime, lequel évolue
+ en fonction d'un vecteur acceleration. Ce dernier vecteur est calculé par une méthode virtuelle en Oscillateur, qui est par contre
+ explicitée par chaque sous-classe d'Oscillateur, qui corréspond en effet à la foction qui caractérise physiquement chaque type d'oscillateur harmonique (qui retourne le vecteur acceleration).
+
+
+[Question P6.2] Quelle est la relation entre les classes Integrateur et IntegrateurEulerCromer ?
+
+ Aucune, comme expliqué dans la réponse à la question précedente, chez nous l'integrateur est une méthode propre à chaque objet de type oscillateur.
+ Une méthode le permettant d'évoluer en fonction d'un certain interval de temps (assez petit dt), entré en paramètre.
+
+
+[Question P7.1] Comment se situent ces classes (Pendule et Ressort) par rapport à la classe Oscillateur définie la semaine passée ?
+
+ Comment déjà fait la semaine passée (voir journal), on a décidé de les définir comme étant des sous-classe d'Oscillateur, laquelle contient leurs vecteurs caractéristiques 
+ et la méthode d'integration les permettant d'évoluer. Ceci nous parait tout affait logique.
+
+
+
+# Semaine 7
+
+
+[Question P8.1] En termes de POO, quelle est donc la nature de la méthode dessine() ?
+
+ La methode dessine est une methode virtuelle, qui est redefinie pour chaque dessinables, pour spécifier comment chaque objet doit être dessinné. De plus étant elle virtuelle, cela permet à la resolution dinamique des liens d'avoir lieu.
+
+
+ATTETION Ici je repond aux question posées (p8.2, p8.3), mais je veut faire noter que notre conceptualisation de la classe système ne correspond pas à celle concernée par ces questions.
+On explique la différence avec notre conception dans la réponse à la prochaine question.
+
+
+La classe Systeme devra avoir une collections de différents oscillateurs possibles dont nous invoquerons, au travers de l'intégrateur, les « fonctions f » de sorte que chacun réagisse suivant ses caractéristiques propres.
+
+[Question P8.2] Quelle est la bonne façon de le faire dans un cadre de programmation orientée-objet ?
+
+ La bonne façon de le faire est de déclarer en attribut un vector (notre liste) d'unique_ptr (car pointeurs intelligents plus pratiques que les pointers normaux) pointants sur des Oscillateur.
+ Ainsi, lorsque la "foction f" est appélée pour toutes les composantes de la liste dans une même boucle parcourant cette dernière, 
+ la resolution dinamique des liens a lieu.
+ En faite, en faisant ainsi, dans la liste de pointeur à oscillateurs on peut inserer des pointeurs à des istances héritant de "Oscillateur",
+ car par exemple un Pendule EST-UN Oscillateur.
+ De plus, par la resolution dinamique des liens, lorsqu'on appelle la même fonction pour tout les oscillateurs dans la liste, la fonction sera adaptée à chaque fois pour le type d'oscillateur pour lequel on l'appelle.
+ Ainsi, on peut appeler facilement la fonction f pour tout les oscillateurs, en respectant sa définition pour chaque type d'oscillateur.
+
+[Question P8.3] A quoi faut-il faire attention pour les classes contenant des pointeurs ? Quelles solutions peut-on envisager ?
+
+ Il faut faire attention a deux choses principalement
+
+ -La prémière est que, à la fin de vie d'une instance de type oscillateur, l'adresse déstinée à cette instance doit être désallouée et le pointeur détruit, ceci par celui qui loue l'adresse.
+ Par l'utilisation d'unique_ptr ce problème ne se pose pas car c++ 2011 s'occupe tout seul de desallouer la memoire et détruire les smart pointers.
+ -La deuxième est que, il faut redefinir les constructeurs de copie.
+ Cela pour éviter qu'on copie des pointeurs pointant vers les même adresses dans des instances différentes et que donc,
+ la modification des attribut d'une instance puisse affecter une autre instance.
+ Pour cela, l'utilisation d'unique_ptr impeche que deux de ces pointeurs puissent pointer sur la même zone mémoire, cela évite donc ce problème.
+ (Une autre solution est la redefinition des constructeurs et operateurs de copie).
+
+
+[Question P8.4] Comment représentez vous la classe Systeme ? 
+
+ La classe "System" est une classe, chez nous, héritant (éventuellement) de:
+ - "SKActor" classe des objets qui peuvent évoluer
+ - "Renderable" classe des objets dessinables
+ - "Positionable" classe des objets pouvant être positionnée dans l'espace graphique
+ - "Colorable" classe des objets qui peuvent être colorés
+ - "Describable" classe des objets contenant un lien à un "desciptor", dont leur étât peut être décrit d'un comportement de nature matématique bien précis
+
+ Chaque système contient, en attribut, un offset qui sera la position du système, fonctionnant d'origine pour les oscillateurs/objets physiques contenus dans le système.
+ Il contient aussi une liste de pointeurs à des objets physique tous de même type:
+  par exemple, un système pourra contenir un certain nombre d'oscillateurs, ou un certain nombre d'objets physiques autre que des oscillateurs.
+  Dans le cadre de ce projet, ces objets seront, la pluspart des fois des oscillateurs. 
+ On a choisi d'imposer que les listes d'objets se limitent à un seul type, pour optimiser du point du vu des contrôle pour le lancement des différentes méthodes liées à chaque type d'objet:
+  par exemple, si le système contient que des objets dessinables, colorable et positionnables, mais qui n'évoluent point, il ne lui sera pas demandé de controller si il faut faire évoluer les objets
+  et il ne le fera donc pas.
+ De plus on a choisi d'utiliser des simple pointeurs, car les objet pointés peuvent interagir aussi avec d'autres partie du programme, et doivent donc pouvoir être modifiés ailleurs.
+
+ Pour avoir une meilleur definition de notre classe "System", on suggère de lire les paragraphes concernés dans le fichier conception.pdf, c-à-d Scene et Scenewrapper, respectivement paragraphes 2.1 et 2.4 
+ 
+ 
+ #Semaine 10
+ 
+ 
+ [Question P11.1] Comment représentez-vous ces nouveaux oscillateurs ? Où s'incrivent-ils dans votre conception ? 
+ 
+  Vieille implementation
+  Pour l'instant, sauf nouvelle conception améliorant le programme, nos oscillateurs couplés sont des simple oscillateur, avec leur propre fonction d'évolution 
+  et une réference à l'oscillateur avec lesquels ils sont couplée.
+  Cette réference (un pointeur sur l'oscillateur) permet aux oscillateur d'accèder, à travers les méthodes d'accès (getters) aux informations importantes pour qu'ils puissent évoluer correctement, 
+  vu que le mouvement d'un des deux oscillateurs dépends de l'autre et vice-versa.
+  Dans le cas d'osccillateurs couplées ayant une foction d'évolution très similaire, on crée une classe mère (abstraite) contenant cette forme, 
+  et on specifie le paramètres qui changent dans les sous classes representantes les deux oscillateurs.
+  Par exemple, pour le pendule couplé on a une classe abstraite PenduleC contenant la fonction d'évolution, et deux sous classes PenduleC1 et PenduleC2 où l'on specifie les paramètres qui changent.
+ 
+  Nouvelle implementation (semaine d'après)
+  On s'est rendus compte que en construisant comme avant le système d'oscillateurs couplées, la mise à jour des valeurs de position et vitesse de chaque pendule ne se faisait pas correctement.
+  Ceci portait notre système à avoir une énergie instable, qui oscillait jusqu'un point de rupture,où la vitesse des deux pendule divergeait fortement (à l'infini). 
+  Maintenant on a donc implementé le système en le faisant évoluer grace à un seul descriptor (objet qui possiède une foction decrivant l'évolution d'une particule (ou plusieurs)),
+  une classe "PenduleCouple" qui a comme vecteur position et vitesse un vecteur de dimension 2, lequel stoque les valeur de position et vitesse des deux pendules (oscillateur dans le cas d'autres classes similaires).
+  Ainsi, le descriptor permet de faire évoluer les quatre paramètre simultanément par un seul passage dans l'integrateur (ce qui n'était pas possible dans la vieille implementation).
+ 
+  P.S. La vieille implementation reste disponible dans le repertoir " Templates ", òu l'on garde la pluspart des fichiers de test, ou même dans le subdir Alpha.
+  P.P.S. Le système divergeait plutôt à cause d'un erreur dans la formule à integrer. On garde quand même la nouvelle implementation, parce que l'ordre d'integration est meilleur.
+ 
+ 
+ # Semaine 11
+ 
+ [Question P12.1] Comment implémentez-vous la possibilité de tracer les trajectoires dans l'espace des phases ?
+ 
+ On a d'abord créée une structure pour le point 2D, ensuite un stream "PlotStream" qui cumule les points du graphe au travers différentes méthodes.
+ Par la suite on a défini la classe pour une phenètre graphique qui prend ce stream et dessinne les point contenus en mode 2D sur la phenètre.
+ 
+Integrateurs
+ [Question P13.1] Où cela s'intègre-t-il dans votre projet/conception ? Quels changements cela engendre ? 
+  Il nous a suffit d'ajouter dans le fichier Integrators.h et .tpp une autre méthode d'integration, ainsi le code ne change pas et les descriptors(Classes Oscillateur) pourront appeler soit une méthode soit l'autre, 
+  en fonction d'un attribut de type enum que l'on initalisera dans le constructeur de la classe,
+  et qu'on pourra changer par une autre méthode si l'on voudra changer d'integrateur.
